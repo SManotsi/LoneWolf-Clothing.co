@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17232D">
+<title>Shop | LoneWolf Clothing.co</title>
+<link rel="icon" href="wolf-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="lw-header"></div>
+<main>
+  <div class="container shop-head">
+    <span class="eyebrow">The LoneWolf edit · 2026</span>
+    <h1 id="shop-title">Made to move your way.</h1>
+    <p style="color:var(--muted);max-width:620px">Everyday layers, confident shapes and thoughtful details. Filter by size, category or price to build your own look.</p>
+
+    <div class="toolbar">
+      <div class="chips" id="cats" role="group" aria-label="Category"></div>
+      <div class="tools">
+        <input id="q" type="search" placeholder="Search the collection" aria-label="Search products">
+        <select id="price" aria-label="Price range">
+          <option value="">Any price</option>
+          <option value="0-499">Under R500</option>
+          <option value="500-999">R500 – R999</option>
+          <option value="1000-99999">R1,000 and over</option>
+        </select>
+        <select id="sort" aria-label="Sort products">
+          <option value="featured">Featured</option>
+          <option value="new">Newest</option>
+          <option value="price-low">Price: low to high</option>
+          <option value="price-high">Price: high to low</option>
+        </select>
+      </div>
+    </div>
+    <div class="size-filter" id="sizes" role="group" aria-label="Filter by size"><span>Size</span></div>
+    <div class="result-meta"><span id="count" aria-live="polite"></span><button class="chip" id="clear" type="button" hidden>Clear filters</button></div>
+  </div>
+  <div class="container"><section class="product-grid" id="grid" style="padding-bottom:80px"></section></div>
+</main>
+<div id="lw-footer"></div>
+<script src="products.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+  var L = window.LW, P = L.P;
+  var params = new URLSearchParams(location.search);
+  var state = { cat: params.get("cat") || "All", q: params.get("q") || "", sale: params.get("sale") === "1", size: "", price: "", sort: "featured" };
+  var cats = ["All"].concat(P.reduce(function(a,p){ if(a.indexOf(p.category)<0) a.push(p.category); return a; }, [])).concat(["Sale"]);
+  if (state.sale) state.cat = "Sale";
+  var SIZES = ["XS","S","M","L","XL","XXL"];
+
+  function paintFilters(){
+    L.$("#cats").innerHTML = cats.map(function(c){ return '<button class="chip" type="button" data-cat="'+c+'" aria-pressed="'+(c===state.cat)+'">'+c+'</button>'; }).join("");
+    L.$("#sizes").innerHTML = '<span>Size</span>' + SIZES.map(function(s){ return '<button class="mini-chip" type="button" data-size="'+s+'" aria-pressed="'+(s===state.size)+'">'+s+'</button>'; }).join("");
+    L.$("#q").value = state.q; L.$("#price").value = state.price; L.$("#sort").value = state.sort;
+  }
+  function filtered(){
+    var q = state.q.trim().toLowerCase(), range = state.price ? state.price.split("-").map(Number) : null;
+    var list = P.filter(function(p){
+      if (state.cat === "Sale" ? !p.was : (state.cat !== "All" && p.category !== state.cat)) return false;
+      if (q && (p.name+" "+p.category+" "+p.description+" "+p.colors.map(function(c){return c.name;}).join(" ")).toLowerCase().indexOf(q) < 0) return false;
+      if (state.size && p.sizes.indexOf(state.size) < 0) return false;
+      if (range && (p.price < range[0] || p.price > range[1])) return false;
+      return true;
+    });
+    if (state.sort === "price-low") list.sort(function(a,b){return a.price-b.price;});
+    else if (state.sort === "price-high") list.sort(function(a,b){return b.price-a.price;});
+    else if (state.sort === "new") list.sort(function(a,b){return (b.badge==="New")-(a.badge==="New");});
+    return list;
+  }
+  function render(){
+    var list = filtered();
+    L.$("#grid").innerHTML = list.length ? list.map(L.cardHTML).join("") : '<p class="empty-state"><b>No pieces match those filters.</b><br>Try a different size, category or search word.</p>';
+    L.$("#count").textContent = list.length + (list.length === 1 ? " piece" : " pieces");
+    var active = state.cat !== "All" || state.q || state.size || state.price;
+    L.$("#clear").hidden = !active;
+    L.$("#shop-title").textContent = state.cat === "All" ? "Made to move your way." : (state.cat === "Sale" ? "Sale" : state.cat);
+    document.dispatchEvent(new CustomEvent("lw:update"));
+  }
+  document.addEventListener("click", function(e){
+    var c = e.target.closest("[data-cat]"), s = e.target.closest("[data-size]");
+    if (c && c.parentNode.id === "cats") { state.cat = c.dataset.cat; paintFilters(); render(); }
+    if (s && s.parentNode.id === "sizes") { state.size = state.size === s.dataset.size ? "" : s.dataset.size; paintFilters(); render(); }
+    if (e.target.id === "clear") { state = { cat:"All", q:"", sale:false, size:"", price:"", sort: state.sort }; paintFilters(); render(); }
+  });
+  L.$("#q").addEventListener("input", function(e){ state.q = e.target.value; render(); });
+  L.$("#price").addEventListener("change", function(e){ state.price = e.target.value; render(); });
+  L.$("#sort").addEventListener("change", function(e){ state.sort = e.target.value; render(); });
+  paintFilters(); render();
+})();
+</script>
+</body>
+</html>

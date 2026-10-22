@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17232D">
+<title>Checkout | LoneWolf Clothing.co</title>
+<link rel="icon" href="wolf-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="lw-header"></div>
+<main>
+  <div class="container">
+    <div class="shop-head"><span class="eyebrow">Almost there</span><h1>Checkout</h1></div>
+    <div id="co-empty" hidden class="empty" style="padding:80px 0"><h3>Your bag is empty</h3><p>Add something first, then come back here.</p><a class="btn btn-primary" style="margin-top:18px" href="shop.html">Shop the collection</a></div>
+    <div id="co-confirm" hidden class="confirm"></div>
+
+    <form id="co-form" class="checkout" novalidate hidden>
+      <div>
+        <div class="demo-note" style="margin-bottom:20px"><b>Demo checkout.</b> This is a front-end demo. No payment is taken, no order is placed and nothing is sent anywhere. Details stay in this browser.</div>
+        <section class="panel"><h2>Contact</h2>
+          <div class="form-field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required></div>
+        </section>
+        <section class="panel"><h2>Delivery address</h2>
+          <div class="form-row">
+            <div class="form-field"><label for="first">First name</label><input id="first" autocomplete="given-name" required></div>
+            <div class="form-field"><label for="last">Last name</label><input id="last" autocomplete="family-name" required></div>
+          </div>
+          <div class="form-field"><label for="addr">Street address</label><input id="addr" autocomplete="address-line1" required></div>
+          <div class="form-row">
+            <div class="form-field"><label for="suburb">Suburb</label><input id="suburb" autocomplete="address-line2"></div>
+            <div class="form-field"><label for="city">City / town</label><input id="city" autocomplete="address-level2" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label for="prov">Province</label>
+              <select id="prov" autocomplete="address-level1" required><option value="">Select…</option><option>Eastern Cape</option><option>Free State</option><option>Gauteng</option><option>KwaZulu-Natal</option><option>Limpopo</option><option>Mpumalanga</option><option>North West</option><option>Northern Cape</option><option>Western Cape</option></select></div>
+            <div class="form-field"><label for="postal">Postal code</label><input id="postal" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="postal-code" required></div>
+          </div>
+          <div class="form-field"><label for="phone">Phone (optional)</label><input id="phone" type="tel" autocomplete="tel"></div>
+        </section>
+        <section class="panel"><h2>Delivery method</h2><div id="ship-opts"></div></section>
+        <section class="panel"><h2>Payment</h2><p class="demo-note">Payment is switched off in this demo, so there are no card fields. A live store would add a secure payment provider here.</p></section>
+        <div class="field-error" id="co-err" role="alert"></div>
+        <button class="btn btn-primary btn-block" type="submit" style="padding:18px;font-size:1.05rem">Place demo order</button>
+      </div>
+
+      <aside class="summary"><section class="panel"><h2>Order summary</h2>
+        <div id="co-lines"></div>
+        <div class="form-row" style="grid-template-columns:1fr auto;gap:10px;margin:14px 0 4px"><input id="promo" class="field" style="border-radius:12px" placeholder="Discount code" aria-label="Discount code"><button type="button" class="btn btn-outline" id="promo-apply" style="padding:11px 20px">Apply</button></div>
+        <div class="field-error" id="promo-msg" role="status" style="margin:0 0 8px"></div>
+        <div class="sum-row"><span>Subtotal</span><span id="s-sub"></span></div>
+        <div class="sum-row" id="s-disc-row" hidden><span>Discount</span><span id="s-disc"></span></div>
+        <div class="sum-row"><span>Delivery</span><span id="s-ship"></span></div>
+        <div class="sum-row total"><span>Total</span><span id="s-total"></span></div>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:10px">Try the sample code <b>LONEWOLF10</b> for 10% off.</p>
+      </section></aside>
+    </form>
+  </div>
+</main>
+<div id="lw-footer"></div>
+<script src="products.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+  var L = window.LW, $ = L.$, esc = L.esc, money = L.money;
+  var st = { ship: "standard", promo: null };
+  function calc(){
+    var sub = L.cart.subtotal(), disc = st.promo ? Math.round(sub * 0.10) : 0, after = sub - disc;
+    var ship = st.ship === "express" ? L.EXPRESS : (after >= L.FREE_SHIP ? 0 : L.STANDARD);
+    return { sub: sub, disc: disc, ship: ship, total: after + ship, after: after };
+  }
+  function paintShip(){
+    var c = calc(), std = c.after >= L.FREE_SHIP ? 0 : L.STANDARD;
+    $("#ship-opts").innerHTML =
+      '<label class="radio-card"><input type="radio" name="ship" value="standard"'+(st.ship==="standard"?" checked":"")+'><div><b>Standard</b><small>3–5 business days</small></div><b>'+(std===0?"Free":money(std))+'</b></label>' +
+      '<label class="radio-card"><input type="radio" name="ship" value="express"'+(st.ship==="express"?" checked":"")+'><div><b>Express</b><small>1–2 business days</small></div><b>'+money(L.EXPRESS)+'</b></label>';
+  }
+  function paint(){
+    var items = L.cart.get();
+    var confirmShown = !$("#co-confirm").hidden;
+    if (confirmShown) return;
+    $("#co-empty").hidden = items.length > 0; $("#co-form").hidden = items.length === 0;
+    if (!items.length) return;
+    $("#co-lines").innerHTML = items.map(function(it){ var p = L.byId(it.id);
+      return '<div class="mini-line"><img src="'+esc(p.image)+'" alt=""><div><b>'+esc(p.name)+'</b><small>'+esc(it.color)+' · '+esc(it.size)+' · Qty '+it.qty+'</small></div><b>'+money(p.price*it.qty)+'</b></div>'; }).join("");
+    var c = calc();
+    $("#s-sub").textContent = money(c.sub);
+    $("#s-disc-row").hidden = !c.disc; $("#s-disc").textContent = "−" + money(c.disc);
+    $("#s-ship").textContent = c.ship === 0 ? "Free" : money(c.ship);
+    $("#s-total").textContent = money(c.total);
+    paintShip();
+  }
+  document.addEventListener("lw:update", paint);
+  $("#ship-opts").addEventListener("change", function(e){ if (e.target.name === "ship") { st.ship = e.target.value; paint(); } });
+  $("#promo-apply").addEventListener("click", function(){
+    var v = $("#promo").value.trim().toUpperCase(), msg = $("#promo-msg");
+    if (v === "LONEWOLF10") { st.promo = v; msg.style.color = "var(--teal)"; msg.textContent = "Code applied: 10% off."; }
+    else { st.promo = null; msg.style.color = ""; msg.textContent = v ? "That code isn't valid." : "Enter a code first."; }
+    paint();
+  });
+  $("#co-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var req = ["email","first","last","addr","city","prov","postal"], bad = [];
+    req.forEach(function(id){ var el = $("#"+id), ok = el.value.trim() && el.checkValidity(); el.setAttribute("aria-invalid", ok ? "false" : "true"); if (!ok) bad.push(el); });
+    var err = $("#co-err");
+    if (bad.length) { err.textContent = "Please complete the highlighted fields (postal code is 4 digits)."; bad[0].focus(); return; }
+    err.textContent = "";
+    var items = L.cart.get(), c = calc();
+    var num = "LW-" + String(Math.floor(100000 + Math.random() * 900000));
+    var order = { number: num, name: $("#first").value.trim(), email: $("#email").value.trim(), city: $("#city").value.trim(), total: c.total,
+      ship: st.ship, lines: items.map(function(it){ var p = L.byId(it.id); return { name: p.name, color: it.color, size: it.size, qty: it.qty, price: p.price }; }) };
+    L.write("lonewolf-last-order", order);
+    L.cart.clear();
+    $("#co-form").hidden = true; $("#co-empty").hidden = true;
+    var cf = $("#co-confirm"); cf.hidden = false;
+    cf.innerHTML = '<div class="tick" aria-hidden="true">✓</div><h2 style="font-size:2.2rem;margin-bottom:10px">Thanks, '+esc(order.name)+'.</h2><p style="color:var(--muted)">This was a demo, so no order was placed and no payment was taken. If it were real, your confirmation <b>'+esc(num)+'</b> would be on its way to '+esc(order.email)+'.</p>' +
+      '<div class="panel" style="text-align:left;margin-top:28px">'+order.lines.map(function(l){ return '<div class="sum-row"><span>'+l.qty+' × '+esc(l.name)+' ('+esc(l.color)+', '+esc(l.size)+')</span><span>'+money(l.price*l.qty)+'</span></div>'; }).join("")+'<div class="sum-row total"><span>Total</span><span>'+money(order.total)+'</span></div></div>' +
+      '<a class="btn btn-primary" href="shop.html" style="margin-top:8px">Keep shopping</a>';
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

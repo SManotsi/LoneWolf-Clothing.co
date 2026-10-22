@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17232D">
+<title>Lookbook | LoneWolf Clothing.co</title>
+<link rel="icon" href="wolf-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="lw-header"></div>
+<main>
+  <section class="page-hero" style="background:linear-gradient(140deg,var(--navy),#263c45)">
+    <span class="eyebrow light">Field notes · 01</span><h1>Move in your own direction.</h1><p>A little inspiration for the everyday: strong layers, considered details and room to make the look your own.</p>
+  </section>
+  <section class="section tight">
+    <div class="container">
+      <div class="chips" style="justify-content:center;margin-bottom:28px" role="group" aria-label="Filter lookbook images" id="lb-filters">
+        <button class="chip" data-filter="all" aria-pressed="true">All looks</button><button class="chip" data-filter="layers" aria-pressed="false">Layers</button><button class="chip" data-filter="everyday" aria-pressed="false">Everyday</button><button class="chip" data-filter="details" aria-pressed="false">Details</button>
+      </div>
+      <div class="gallery-grid" id="gallery">
+        <article class="look" data-category="layers"><img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80" alt="Model in a dark utility jacket" loading="lazy"><div class="look-copy"><span>Layers</span><h2>After-hours uniform</h2><p>Grounded tones. Uncomplicated layers.</p><a href="product.html?id=north-jacket">Shop the jacket →</a></div></article>
+        <article class="look" data-category="everyday"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=80" alt="Streetwear look with a relaxed silhouette" loading="lazy"><div class="look-copy"><span>Everyday</span><h2>Go your own way</h2><p>Comfort that keeps its edge.</p><a href="product.html?id=nightfall-jacket">Shop the look →</a></div></article>
+        <article class="look" data-category="details"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1000&q=80" alt="Minimal everyday cotton tee" loading="lazy"><div class="look-copy"><span>Details</span><h2>Less, but better</h2><p>Good fabric does the talking.</p><a href="product.html?id=ember-tee">Shop the tee →</a></div></article>
+        <article class="look" data-category="everyday"><img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80" alt="Casual graphic tee style" loading="lazy"><div class="look-copy"><span>Everyday</span><h2>Quiet confidence</h2><p>A relaxed fit for long days.</p><a href="product.html?id=wildline-tee">Shop the tee →</a></div></article>
+        <article class="look" data-category="layers"><img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=1000&q=80" alt="Contemporary streetwear layered look" loading="lazy"><div class="look-copy"><span>Layers</span><h2>Built for the in-between</h2><p>Throw it on. Make it yours.</p><a href="product.html?id=signal-tee">Shop the look →</a></div></article>
+        <article class="look" data-category="details"><img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80" alt="Classic cap as a streetwear accessory" loading="lazy"><div class="look-copy"><span>Details</span><h2>Finish your own way</h2><p>The small things make the look.</p><a href="product.html?id=roam-cap">Shop the cap →</a></div></article>
+      </div>
+    </div>
+  </section>
+  <section class="cta"><h2>Your look. Your rules.</h2><p>Find the pieces that feel like you in the LoneWolf collection.</p><a class="btn btn-primary" href="shop.html">Shop the collection</a></section>
+</main>
+<div id="lw-footer"></div>
+<script src="products.js"></script>
+<script src="site.js"></script>
+<script>
+document.getElementById("lb-filters").addEventListener("click",function(e){var b=e.target.closest("[data-filter]");if(!b)return;var f=b.dataset.filter;document.querySelectorAll("#lb-filters .chip").forEach(function(i){i.setAttribute("aria-pressed",String(i===b));});document.querySelectorAll(".look").forEach(function(c){c.hidden=f!=="all"&&c.dataset.category!==f;});});
+</script>
+</body>
+</html>

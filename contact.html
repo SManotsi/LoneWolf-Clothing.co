@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17232D">
+<title>Contact | LoneWolf Clothing.co</title>
+<link rel="icon" href="wolf-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="lw-header"></div>
+<main>
+  <section class="page-hero" style="--hero-img:url('https://images.unsplash.com/photo-1543076447-215ad9ba6923?auto=format&fit=crop&w=1800&q=80')">
+    <span class="eyebrow light">Say hello</span><h1>Contact LoneWolf</h1>
+    <p>Try the demo contact form and feedback feature. Questions about sizing, orders or collaborations are all welcome.</p>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Get in touch</span><h2>We'd love to hear from you.</h2><p>This is a front-end demo. No message is sent to a real inbox.</p></div>
+      <div class="grid-4">
+        <div class="card contact-card"><div class="icon-wrap" aria-hidden="true">✉️</div><h3>Email</h3><a href="#contactForm" style="color:var(--muted);font-weight:500;text-decoration:underline">Use the demo message form</a></div>
+        <div class="card contact-card"><div class="icon-wrap" aria-hidden="true">📞</div><h3>Phone</h3><p>No phone support is connected in this demo.</p></div>
+        <div class="card contact-card"><div class="icon-wrap" aria-hidden="true">💬</div><h3>WhatsApp</h3><p>No messaging service is connected.</p></div>
+        <div class="card contact-card"><div class="icon-wrap" aria-hidden="true">📍</div><h3>Location</h3><p>No physical address is listed for this demo.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Send a message</span><h2>Ask us anything.</h2><p>We'll get back to you as soon as possible (in a live store).</p></div>
+      <form id="contactForm" class="form-card" novalidate>
+        <div class="form-row">
+          <div class="form-field"><label for="name">Name</label><input id="name" type="text" placeholder="Your name" maxlength="60" required></div>
+          <div class="form-field"><label for="email">Email</label><input id="email" type="email" placeholder="Your email" required></div>
+        </div>
+        <div class="form-field"><label for="subject">Subject</label><input id="subject" type="text" placeholder="How can we help?" maxlength="100" required></div>
+        <div class="form-field"><label for="message">Message</label><textarea id="message" placeholder="Tell us about your enquiry…" maxlength="800" required></textarea></div>
+        <div class="field-error" id="c-err" role="alert"></div>
+        <button type="submit" class="btn btn-tertiary">Send message</button>
+      </form>
+      <div class="form-card" style="margin-top:36px">
+        <h3 style="margin-bottom:4px">Sample feedback</h3><p style="color:var(--muted);margin-bottom:10px">Fictional examples for demonstration only. Messages you send above appear here on this device.</p>
+        <div id="feedbackList"></div>
+      </div>
+    </div>
+  </section>
+  <section class="cta"><h2>Make the look your own.</h2><p>Explore LoneWolf streetwear: comfortable everyday pieces with a confident point of view.</p><a href="shop.html" class="btn btn-primary">Shop collection</a></section>
+</main>
+<div id="lw-footer"></div>
+<script src="products.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+  var L = window.LW, $ = L.$, esc = L.esc;
+  var KEY = "lonewolfContactFeedback";
+  var defaults = [
+    { name: "Demo sample", location: "Sample review", rating: 5, message: "The fit is comfortable and the graphic gives this everyday piece a confident edge." },
+    { name: "Demo sample", location: "Sample review", rating: 5, message: "Easy to style, comfortable to wear, and full of character." },
+    { name: "Demo sample", location: "Sample review", rating: 5, message: "A clean look with thoughtful details. This is sample feedback for the website demo." }
+  ];
+  function get(){ var r = L.read(KEY, null); if (!Array.isArray(r) || !r.length) { r = defaults.slice(); L.write(KEY, r); } return r; }
+  function stars(n){ n = Math.min(5, Math.max(1, Number(n) || 5)); return "★".repeat(n) + "☆".repeat(5-n); }
+  function render(){
+    $("#feedbackList").innerHTML = get().slice().reverse().map(function(i){
+      return '<div style="padding:16px 0;border-bottom:1px solid var(--line)"><strong style="display:block">'+esc(i.name)+'</strong><p style="color:var(--muted)">'+esc(i.message)+'</p><small style="color:var(--copper-dark);font-weight:600">'+esc(i.location||"Customer")+' · '+stars(i.rating)+'</small></div>';
+    }).join("");
+  }
+  $("#contactForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var f = { name: $("#name").value.trim(), email: $("#email"), subject: $("#subject").value.trim(), message: $("#message").value.trim() };
+    if (!f.name || !f.email.value || !f.email.checkValidity() || !f.subject || !f.message) { $("#c-err").textContent = "Please complete every field with a valid email."; return; }
+    $("#c-err").textContent = "";
+    var list = get(); list.push({ name: f.name, location: "Customer", rating: 5, message: f.subject + ": " + f.message }); L.write(KEY, list);
+    render(); e.target.reset(); L.toast("Thanks! Handled locally as a demo. No email was sent.");
+  });
+  render();
+})();
+</script>
+</body>
+</html>

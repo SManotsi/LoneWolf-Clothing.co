@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#17232D">
+<title>Wishlist | LoneWolf Clothing.co</title>
+<link rel="icon" href="wolf-mark.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div id="lw-header"></div>
+<main>
+  <div class="container shop-head">
+    <span class="eyebrow">Saved for later</span>
+    <h1>Your wishlist</h1>
+    <p style="color:var(--muted)" id="wl-sub">Tap the heart on any piece to keep it here. Saved on this device.</p>
+  </div>
+  <div class="container" style="padding-bottom:90px"><section class="product-grid" id="wl-grid"></section></div>
+</main>
+<div id="lw-footer"></div>
+<script src="products.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+  var L = window.LW;
+  function render(){
+    var ids = L.wish.get(), grid = L.$("#wl-grid");
+    if (!ids.length) {
+      grid.innerHTML = '<div class="wish-grid-empty" style="grid-column:1/-1"><h2 style="margin-bottom:10px">Nothing saved yet</h2><p style="color:var(--muted);margin-bottom:22px">Find a piece you like and tap the heart.</p><a class="btn btn-primary" href="shop.html">Browse the shop</a></div>';
+      L.$("#wl-sub").textContent = "Tap the heart on any piece to keep it here. Saved on this device.";
+      return;
+    }
+    L.$("#wl-sub").textContent = ids.length + (ids.length === 1 ? " saved piece" : " saved pieces") + ". Saved on this device.";
+    grid.innerHTML = ids.map(function(id){ return L.cardHTML(L.byId(id)); }).join("");
+  }
+  /* re-render only when the set of saved items changes (not on bag updates) */
+  var last = L.wish.get().join(",");
+  document.addEventListener("lw:update", function(){ var now = L.wish.get().join(","); if (now !== last) { last = now; render(); } });
+  render();
+})();
+</script>
+</body>
+</html>
